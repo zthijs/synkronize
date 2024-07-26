@@ -36,9 +36,6 @@ WORKDIR /usr/src/app
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
 
-# Add support for environment variables
-COPY .env .env
-
 VOLUME ["/usr/src/app/data"]
 
 EXPOSE 3000
