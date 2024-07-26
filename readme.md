@@ -1,4 +1,4 @@
-# Synkronize Service
+# Synkronize
 
 Synkronize is a NestJS-based API designed to synchronize music playback with smart lights and other devices. This application integrates with Spotify and Dirigera to create a seamless experience for controlling smart lights based on the music being played.
 
@@ -21,8 +21,8 @@ Synkronize is a NestJS-based API designed to synchronize music playback with sma
 
 ## Requirements
 
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+- Node.js (v18 or higher)
+- npm (v10 or higher)
 - SQLite
 
 ## Installation
@@ -30,7 +30,7 @@ Synkronize is a NestJS-based API designed to synchronize music playback with sma
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/synkronize.git
+   git clone https://github.com/zthijs/synkronize.git
    cd synkronize
    ```
 
@@ -52,6 +52,16 @@ DIRIGERA_ACCESS_TOKEN=your_dirigera_access_token
 ```
 
 Replace `your_spotify_client_id`, `your_spotify_client_secret`, `your_spotify_redirect_uri`, and `your_dirigera_access_token` with your actual Spotify and Dirigera credentials.
+
+### Obtaining Dirigera Access Token
+
+To get a Dirigera access token, execute the following command:
+
+```bash
+npx dirigera authenticate
+```
+
+Follow the prompts to authenticate and obtain your access token.
 
 ## Running the Application
 
