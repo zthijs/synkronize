@@ -21,7 +21,7 @@ Synkronize is a NestJS-based API designed to synchronize music playback with sma
 
 ## Requirements
 
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - npm (v10 or higher)
 - SQLite
 
