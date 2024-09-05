@@ -21,6 +21,17 @@ export class DirigeraController {
     }
   }
 
+  @Get('lights/enabled')
+  @ApiOperation({ summary: 'Get all  lights' })
+  async getEnabledLights() {
+    try {
+      return await this.dirigeraService.getEnabledLights();
+    } catch (error) {
+      this.logger.error('Error getting lights:', error);
+      throw new NotFoundException('Lights not found');
+    }
+  }
+
   @Get('lights/:lightId')
   @ApiOperation({ summary: 'Get a light by ID' })
   @ApiParam({ name: 'lightId', description: 'Light ID' })
@@ -69,4 +80,5 @@ export class DirigeraController {
       throw new NotFoundException(`Unable to set HSL for light ${lightId}`);
     }
   }
+  
 }
