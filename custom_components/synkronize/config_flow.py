@@ -84,16 +84,21 @@ def _select(key: str, options: list[str]) -> SelectSelector:
 def _slider(
     minimum: float, maximum: float, step: float, unit: str | None = None
 ) -> NumberSelector:
-    """Build a slider selector."""
-    return NumberSelector(
-        NumberSelectorConfig(
-            min=minimum,
-            max=maximum,
-            step=step,
-            unit_of_measurement=unit,
-            mode=NumberSelectorMode.SLIDER,
-        )
+    """Build a slider selector.
+
+    ``unit_of_measurement`` is omitted rather than set to ``None`` for unitless
+    sliders: NumberSelectorConfig validates the key as a plain ``str``, so
+    passing ``None`` raises and takes the whole options form down with it.
+    """
+    config = NumberSelectorConfig(
+        min=minimum,
+        max=maximum,
+        step=step,
+        mode=NumberSelectorMode.SLIDER,
     )
+    if unit is not None:
+        config["unit_of_measurement"] = unit
+    return NumberSelector(config)
 
 
 class SynkronizeConfigFlow(ConfigFlow, domain=DOMAIN):
