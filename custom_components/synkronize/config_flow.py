@@ -62,12 +62,9 @@ def _friendly_name(hass: HomeAssistant, entity_id: str) -> str:
     return state.attributes.get("friendly_name") or entity_id
 
 
-def _entry_title(hass: HomeAssistant, media_player: str, lights: list[str]) -> str:
-    """Build a readable title such as ``Spotify -> Bed Light``."""
-    source = _friendly_name(hass, media_player)
-    if len(lights) == 1:
-        return f"{source} -> {_friendly_name(hass, lights[0])}"
-    return f"{source} -> {len(lights)} lights"
+def _entry_title(hass: HomeAssistant, media_player: str) -> str:
+    """Build the entry title, such as ``Walkman Sync``."""
+    return f"{_friendly_name(hass, media_player)} Sync"
 
 
 def _select(key: str, options: list[str]) -> SelectSelector:
@@ -124,7 +121,7 @@ class SynkronizeConfigFlow(ConfigFlow, domain=DOMAIN):
                 )
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(
-                    title=_entry_title(self.hass, media_player, lights),
+                    title=_entry_title(self.hass, media_player),
                     data=user_input,
                 )
 

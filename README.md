@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" alt="Synkronize" width="128" height="128">
+</p>
+
 # Synkronize
 
 [![Validate](https://github.com/zthijs/synkronize/actions/workflows/validate.yml/badge.svg)](https://github.com/zthijs/synkronize/actions/workflows/validate.yml)
@@ -59,11 +63,13 @@ directory and restart Home Assistant.
 - the **media player** whose artwork to follow, and
 - the **lights** that should follow it (RGB-capable).
 
-That creates one `light.synkronize_*` entity. Turn it on to start syncing.
+That creates one entity, named after the media player - following
+`media_player.walkman` gives you `light.synkronize_walkman_sync`, titled
+"Walkman Sync". Turn it on to start syncing.
 
 ```yaml
 type: tile
-entity: light.synkronize_spotify_bed_light
+entity: light.synkronize_walkman_sync
 features:
   - type: light-brightness
 ```
@@ -112,7 +118,7 @@ the dominant color for genuinely greyscale artwork. You always get *a* color.
 # Re-download the current artwork and re-apply it, bypassing the cache
 action: synkronize.resync
 target:
-  entity_id: light.synkronize_spotify_bed_light
+  entity_id: light.synkronize_walkman_sync
 ```
 
 ```yaml
@@ -120,7 +126,7 @@ target:
 # Handy in automations, and for checking the pipeline without playing anything.
 action: synkronize.apply_image
 target:
-  entity_id: light.synkronize_spotify_bed_light
+  entity_id: light.synkronize_walkman_sync
 data:
   image_url: /local/poster.jpg
 ```
@@ -130,7 +136,7 @@ Everything else is a stock action on the entity:
 ```yaml
 action: light.turn_on
 target:
-  entity_id: light.synkronize_spotify_bed_light
+  entity_id: light.synkronize_walkman_sync
 data:
   effect: Dark Vibrant
   brightness: 200
@@ -211,6 +217,30 @@ Assistant instance - see `tests/test_color_extractor.py`.
 | `light_controller.py` | Talking to the real lights, with per-light error tracking |
 | `snapshot.py` | Capturing and restoring the pre-sync light state |
 | `config_flow.py` | Setup and options flows |
+
+### Brand images
+
+Home Assistant serves the integration's icon straight from the repository - no
+submission to [home-assistant/brands](https://github.com/home-assistant/brands)
+is needed for it to appear in your own instance. The files live in
+`custom_components/synkronize/brand/`, and the directory's presence is what
+switches the feature on.
+
+| File | Size | Used for |
+| --- | --- | --- |
+| `icon.png` | 256x256 | The square mark, everywhere |
+| `icon@2x.png` | 512x512 | High-DPI displays |
+| `dark_icon.png` | 256x256 | Dark themes |
+| `dark_icon@2x.png` | 512x512 | Dark themes, high-DPI |
+
+Only `icon.png` is strictly required: Home Assistant falls back along
+`logo.png -> icon.png` and `dark_* -> *`, so a single file covers all eight
+names it may ask for. Replacing the art is a matter of dropping in new PNGs at
+those sizes and restarting.
+
+Publishing to the HACS default repository is a separate step that *does* need a
+PR to home-assistant/brands. Until then `validate.yml` carries `ignore: brands`,
+which skips that check.
 
 ## License
 
