@@ -8,53 +8,29 @@
 [![Lint](https://github.com/zthijs/synkronize/actions/workflows/lint.yml/badge.svg)](https://github.com/zthijs/synkronize/actions/workflows/lint.yml)
 [![Test](https://github.com/zthijs/synkronize/actions/workflows/test.yml/badge.svg)](https://github.com/zthijs/synkronize/actions/workflows/test.yml)
 
-**Set your lights to the vibrant color of whatever your media player is playing.**
+**Your lights take the color of the album art that is playing.**
 
-Synkronize is a custom integration for [Home Assistant](https://www.home-assistant.io/).
-It watches a `media_player`, pulls the album art of the current track, picks the
-most *vibrant* color out of it, and pushes that to your RGB lights. When
-playback stops it hands the lights back exactly as it found them.
-
-## Why "vibrant" and not "dominant"
-
-Most color-extraction tools give you the *most common* color in an image. On
-album art that is usually the background - a near-black, or a washed-out grey -
-which on a lamp reads as "the light failed to turn on".
-
-Synkronize scores the whole extracted palette instead, the way Android's Palette
-API does: candidates are judged on how close their saturation and lightness sit
-to a target, with dominance only as a tiebreaker. Run against real photos, the
-difference is the entire point of the integration:
-
-| Image                  | Most common color | What Synkronize picks |
-| ---------------------- | ----------------- | --------------------- |
-| Forest photo           | `#364f21` (dark olive) | `#7db21d` (bright green) |
-| Lake at dusk           | `#212a19` (near black) | `#28aab9` (teal)         |
-| Beach sunset           | `#f49c99` (pale pink)  | `#fd5d3a` (orange)       |
-
-## Features
-
-- **Follows any media player** - anything that publishes album art works: Spotify, Sonos, Plex, Music Assistant, Chromecast.
-- **Vibrancy scoring** - five swatches per cover (Vibrant, Light Vibrant, Dark Vibrant, Muted, Dominant), selectable from the stock light card's effect dropdown.
-- **Saturation boost** - pushes the extracted color toward full saturation so it actually reads as vivid on a lamp.
-- **Multi-light** - spread the palette across your lights, or put the same color on all of them.
-- **Puts your lights back** - the pre-sync state is snapshotted and restored when the music stops.
-- **One entity** - `light.synkronize_*` drops into any stock Tile, Mushroom, or Bubble card. No custom card needed.
+Synkronize watches a media player, grabs the artwork of the current track, and
+picks the most *vibrant* color out of it - not the most common one, which on
+album art is usually a near-black background. When the music stops, your lights
+go back exactly as they were.
 
 ## Installation
 
-### HACS
-
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=zthijs&repo=synkronize&category=integration)
 
-1. HACS → three-dot menu → **Custom repositories**
-2. Add `https://github.com/zthijs/synkronize` with category **Integration**
-3. Search for **Synkronize**, install it, and restart Home Assistant
+Click the button above, or add `https://github.com/zthijs/synkronize` to HACS as
+a custom repository with category **Integration**. Restart Home Assistant
+afterwards.
 
-### Manual
+## Features
 
-Copy `custom_components/synkronize` into your `config/custom_components/`
-directory and restart Home Assistant.
+- **Works with any media player** that publishes album art - Spotify, Sonos, Plex, Music Assistant, Chromecast.
+- **Picks the vibrant color**, not the dull background one.
+- **Five swatches per cover** - Vibrant, Light Vibrant, Dark Vibrant, Muted, Dominant - selectable from the light card's effect dropdown.
+- **Multiple lights** get either the same color or one each, spread across the artwork's palette.
+- **Puts your lights back** the way it found them when playback stops.
+- **One normal light entity**, so it drops into any stock Tile, Mushroom, or Bubble card.
 
 ## Setup
 
@@ -105,88 +81,10 @@ alone rather than blanking them.
 
 Saving options reloads the entry, so changes take effect immediately.
 
-### About "minimum saturation"
-
-It is a preference, not a hard floor. Plenty of covers are monochrome or
-near-black and have nothing more colorful to offer. When nothing clears the bar,
-Synkronize relaxes the window in rounds rather than giving up, and falls back to
-the dominant color for genuinely greyscale artwork. You always get *a* color.
-
-## Actions
-
-```yaml
-# Re-download the current artwork and re-apply it, bypassing the cache
-action: synkronize.resync
-target:
-  entity_id: light.synkronize_walkman_sync
-```
-
-```yaml
-# Apply any image's colors, ignoring the media player.
-# Handy in automations, and for checking the pipeline without playing anything.
-action: synkronize.apply_image
-target:
-  entity_id: light.synkronize_walkman_sync
-data:
-  image_url: /local/poster.jpg
-```
-
-Everything else is a stock action on the entity:
-
-```yaml
-action: light.turn_on
-target:
-  entity_id: light.synkronize_walkman_sync
-data:
-  effect: Dark Vibrant
-  brightness: 200
-```
-
-## State attributes
-
-| Attribute | Description |
-| --- | --- |
-| `sync_state` | `disabled`, `waiting`, `synced`, or `manual` |
-| `source_media_player` | The media player being followed |
-| `media_title` / `media_artist` | What is playing right now |
-| `album_art_url` | The artwork the current color came from |
-| `color_hex` | The color being shown, as `#rrggbb` |
-| `swatches` | Every extracted swatch, as `name -> #rrggbb` |
-| `extracted_palette` | The raw ColorThief palette, as `[R, G, B]` triples ordered by dominance |
-| `dominant_hue` / `dominant_saturation` / `dominant_lightness` | HSL breakdown of the dominant color, for template branches |
-| `applied_colors` | What each underlying light was actually set to |
-| `light_entities` / `light_count` | The lights under Synkronize's control |
-| `last_sync` | ISO timestamp of the last successful apply |
-| `last_error` | Cleared on success; set when something went wrong |
-| `failed_lights` | `entity_id -> reason` for lights that could not be updated |
-
-`last_error` and `failed_lights` mean you can debug a misbehaving light from the
-UI without opening the log. Reasons are `not_found`, `unavailable`,
-`no_rgb_support`, and `service_call_failed`.
-
-## Troubleshooting
-
-**The lights never change.** Check `sync_state`. `waiting` means no artwork has
-arrived yet - confirm the media player exposes an `entity_picture` attribute in
-Developer Tools → States. Not every player does.
-
-**"No internal Home Assistant URL is available".** Album art is usually served
-as a relative path by Home Assistant's own media proxy, so Synkronize needs to
-know its own address. Set one under Settings → System → Network.
-
-**Colors look muddy.** Raise the saturation boost, or switch the swatch from
-Dominant to Vibrant.
-
-**A light did not update.** Read `failed_lights`. `no_rgb_support` means the
-light cannot show color at all.
-
-**More detail in the log:**
-
-```yaml
-logger:
-  logs:
-    custom_components.synkronize: debug
-```
+Minimum saturation is a preference, not a hard floor. Plenty of covers are
+monochrome and have nothing more colorful to offer, so when nothing clears the
+bar Synkronize relaxes it in rounds rather than giving up. You always get a
+color.
 
 ## Development
 
@@ -217,30 +115,7 @@ Assistant instance - see `tests/test_color_extractor.py`.
 | `light_controller.py` | Talking to the real lights, with per-light error tracking |
 | `snapshot.py` | Capturing and restoring the pre-sync light state |
 | `config_flow.py` | Setup and options flows |
-
-### Brand images
-
-Home Assistant serves the integration's icon straight from the repository - no
-submission to [home-assistant/brands](https://github.com/home-assistant/brands)
-is needed for it to appear in your own instance. The files live in
-`custom_components/synkronize/brand/`, and the directory's presence is what
-switches the feature on.
-
-| File | Size | Used for |
-| --- | --- | --- |
-| `icon.png` | 256x256 | The square mark, everywhere |
-| `icon@2x.png` | 512x512 | High-DPI displays |
-| `dark_icon.png` | 256x256 | Dark themes |
-| `dark_icon@2x.png` | 512x512 | Dark themes, high-DPI |
-
-Only `icon.png` is strictly required: Home Assistant falls back along
-`logo.png -> icon.png` and `dark_* -> *`, so a single file covers all eight
-names it may ask for. Replacing the art is a matter of dropping in new PNGs at
-those sizes and restarting.
-
-Publishing to the HACS default repository is a separate step that *does* need a
-PR to home-assistant/brands. Until then `validate.yml` carries `ignore: brands`,
-which skips that check.
+| `brand/` | Integration icon, served by Home Assistant straight from the repository |
 
 ## License
 
