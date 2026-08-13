@@ -1,0 +1,89 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Synkronize",
+        "description": "Pick the media player whose artwork you want to follow, and the lights that should follow it.",
+        "data": {
+          "media_player": "Media player",
+          "light_entities": "Lights"
+        },
+        "data_description": {
+          "media_player": "The player Synkronize watches for album art.",
+          "light_entities": "RGB-capable lights. Synkronize takes these over while syncing and hands them back when playback stops."
+        }
+      }
+    },
+    "error": {
+      "no_lights": "Select at least one light."
+    },
+    "abort": {
+      "already_configured": "That media player and light combination is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Synkronize options",
+        "data": {
+          "swatch": "Color to use",
+          "distribution": "With multiple lights",
+          "on_idle": "When playback stops",
+          "idle_grace_seconds": "Wait before handing the lights back",
+          "transition": "Fade duration",
+          "boost": "Saturation boost",
+          "min_saturation": "Minimum saturation"
+        },
+        "data_description": {
+          "swatch": "Which swatch to pull out of the artwork. Vibrant is the punchy mid-brightness color most covers have; Dominant is simply the most common color, which is often a dull background.",
+          "distribution": "Spread gives each light a different color from the artwork; uniform gives them all the same one.",
+          "on_idle": "Restore puts the lights back exactly as they were before syncing started.",
+          "idle_grace_seconds": "How long playback may be paused or stopped before the lights are handed back. Keeps a quick pause from disturbing them.",
+          "transition": "How long each color change takes on the underlying lights.",
+          "boost": "How far the extracted color is pushed toward fully saturated. 0 uses it exactly as found; higher values read as more vivid on a lamp.",
+          "min_saturation": "Palette colors below this saturation are not treated as vibrant. Automatically relaxed for artwork that has nothing more colorful to offer."
+        }
+      }
+    }
+  },
+  "selector": {
+    "swatch": {
+      "options": {
+        "vibrant": "Vibrant",
+        "light_vibrant": "Light Vibrant",
+        "dark_vibrant": "Dark Vibrant",
+        "muted": "Muted",
+        "dominant": "Dominant"
+      }
+    },
+    "distribution": {
+      "options": {
+        "spread": "Spread the palette across the lights",
+        "uniform": "Same color on every light"
+      }
+    },
+    "on_idle": {
+      "options": {
+        "restore": "Restore the previous light state",
+        "hold": "Hold the last color",
+        "off": "Turn the lights off"
+      }
+    }
+  },
+  "services": {
+    "resync": {
+      "name": "Resync",
+      "description": "Re-download the current artwork, re-extract its colors, and re-apply them, bypassing the artwork cache."
+    },
+    "apply_image": {
+      "name": "Apply image",
+      "description": "Extract colors from any image and apply them to the configured lights, ignoring the media player.",
+      "fields": {
+        "image_url": {
+          "name": "Image URL",
+          "description": "Absolute URL of the image, or a path served by this Home Assistant instance such as /local/poster.jpg."
+        }
+      }
+    }
+  }
+}

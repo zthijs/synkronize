@@ -1,0 +1,31 @@
+resync:
+  name: Resync
+  description: >-
+    Re-download the artwork the media player is currently showing, re-extract
+    its colors, and re-apply them. Bypasses the artwork cache, so it is also the
+    way to pick up a cover that changed behind an unchanged URL.
+  target:
+    entity:
+      domain: light
+      integration: synkronize
+
+apply_image:
+  name: Apply image
+  description: >-
+    Extract colors from any image and apply them to the configured lights,
+    ignoring the media player. Useful in automations, and for checking the color
+    pipeline without playing anything.
+  target:
+    entity:
+      domain: light
+      integration: synkronize
+  fields:
+    image_url:
+      name: Image URL
+      description: >-
+        Absolute URL of the image, or a path served by this Home Assistant
+        instance such as /local/poster.jpg.
+      required: true
+      example: "https://example.com/cover.jpg"
+      selector:
+        text:

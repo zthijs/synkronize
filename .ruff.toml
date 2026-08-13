@@ -1,0 +1,30 @@
+
+target-version = "py314"
+
+[lint]
+select = [
+    "ALL",
+]
+
+ignore = [
+    "ANN401",
+    "D203",
+    "D213",
+    "COM812",
+    "ISC001",
+]
+
+[lint.per-file-ignores]
+"tests/*" = [
+    "S101",
+    "PLR2004",
+]
+
+[lint.flake8-pytest-style]
+fixture-parentheses = false
+
+[lint.pyupgrade]
+keep-runtime-typing = true
+
+[lint.mccabe]
+max-complexity = 25

@@ -1,0 +1,8 @@
+-r requirements_lint.txt
+colorlog==6.10.1
+colorthief==0.2.1
+homeassistant==2026.6.4
+Pillow>=10.0.0
+
+av
+numpy

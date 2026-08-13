@@ -1,0 +1,15 @@
+__pycache__
+.pytest*
+*.egg-info
+*/build/*
+*/dist/*
+
+.coverage
+.vscode
+coverage.xml
+.ruff_cache
+.venv
+venv
+
+config/*
+!config/configuration.yaml
